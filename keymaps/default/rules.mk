@@ -26,13 +26,13 @@ ifeq ($(strip $(LED_BACK_ENABLE)), yes)
   RGBLIGHT_ENABLE = yes
   OPT_DEFS += -DRGBLED_BACK
   ifeq ($(strip $(LED_UNDERGLOW_ENABLE)), yes)
-    $(eval $(call HELIX_CUSTOMISE_MSG))
-    $(error LED_BACK_ENABLE and LED_UNDERGLOW_ENABLE both 'yes')
+#    $(eval $(call HELIX_CUSTOMISE_MSG))
+#    $(error LED_BACK_ENABLE and LED_UNDERGLOW_ENABLE both 'yes')
   endif
 else ifeq ($(strip $(LED_UNDERGLOW_ENABLE)), yes)
   RGBLIGHT_ENABLE = yes
 else
-  RGBLIGHT_ENABLE = no
+#  RGBLIGHT_ENABLE = no
 endif
 
 ifeq ($(strip $(LED_ANIMATIONS)), yes)

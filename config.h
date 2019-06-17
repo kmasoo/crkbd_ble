@@ -32,13 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DESCRIPTION     A split keyboard for the cheap makers
 
 /* key matrix size */
-#if  HELIX_ROWS == 4
-  #define MATRIX_ROWS 8
-  #define LAYOUT LAYOUT_HELIX_4ROW
-#elif HELIX_ROWS == 5
-  #define MATRIX_ROWS 10
-  #define LAYOUT LAYOUT_HELIX_5ROW
-#endif
+#define MATRIX_ROWS 8
 #define MATRIX_COLS 7
 
 #define DIODE_DIRECTION COL2ROW
@@ -62,11 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PROGMEM // arm-gcc does not interpret PROGMEM
 #define RGB_DI_PIN 8     // The pin the LED strip is connected to
 #ifdef RGBLED_BACK
-  #if HELIX_ROWS == 4
-    #define RGBLED_NUM 25
-  #else
-    #define RGBLED_NUM 32
-  #endif
+ #define RGBLED_NUM 25
 #else
   #define RGBLED_NUM 6
 #endif
