@@ -1,64 +1,56 @@
-/*
-Copyright 2018 Sekigon
+#include "crkbd_ble.h"
+#include "bootloader.h"
+#include "action_layer.h"
+#include "action_util.h"
+#include "eeconfig.h"
+#ifdef PROTOCOL_LUFA
+#include "lufa.h"
+#include "split_util.h"
+#endif
+//#include "LUFA/Drivers/Peripheral/TWI.h"
+// #ifdef SSD1306OLED
+//   #include "ssd1306.h"
+// #endif
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
+// #include "../lib/mode_icon_reader.c"
+// #include "../lib/layer_state_reader.c"
+// #include "../lib/host_led_state_reader.c"
+// #include "../lib/logo_reader.c"
+// #include "../lib/keylogger.c"
+// #include "../lib/timelogger.c"
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-#include QMK_KEYBOARD_H
 #include "app_ble_func.h"
-
-enum custom_keycodes {
-    AD_WO_L = SAFE_RANGE, /* Start advertising without whitelist  */
-    BLE_DIS,              /* Disable BLE HID sending              */
-    BLE_EN,               /* Enable BLE HID sending               */
-    USB_DIS,              /* Disable USB HID sending              */
-    USB_EN,               /* Enable USB HID sending               */
-    DELBNDS,              /* Delete all bonding                   */
-    ADV_ID0,              /* Start advertising to PeerID 0        */
-    ADV_ID1,              /* Start advertising to PeerID 1        */
-    ADV_ID2,              /* Start advertising to PeerID 2        */
-    ADV_ID3,              /* Start advertising to PeerID 3        */
-    ADV_ID4,              /* Start advertising to PeerID 4        */
-    BATT_LV,              /* Display battery level in milli volts */
-    DEL_ID0,              /* Delete bonding of PeerID 0           */
-    DEL_ID1,              /* Delete bonding of PeerID 1           */
-    DEL_ID2,              /* Delete bonding of PeerID 2           */
-    DEL_ID3,              /* Delete bonding of PeerID 3           */
-    DEL_ID4,              /* Delete bonding of PeerID 4           */
-    ENT_DFU,              /* Start bootloader                     */
-    ENT_SLP,              /* Deep sleep mode                      */
-    QWERTY,
-    LOWER,
-    RAISE,
-    ADJUST,
-    BACKLIT,
-    RGBRST
-};
-
 
 extern keymap_config_t keymap_config;
 
-enum layer_number {
-    _QWERTY = 0,
-    _LOWER,
-    _RAISE,
-    _ADJUST
+#ifdef RGBLIGHT_ENABLE
+//Following line allows macro to read current RGB settings
+extern rgblight_config_t rgblight_config;
+#endif
+
+extern uint8_t is_master;
+
+// Each layer gets a name for readability, which is then used in the keymap matrix below.
+// The underscores don't mean anything - you can have a layer called STUFF or any other name.
+// Layer names don't all need to be of the same length, obviously, and you can also skip them
+// entirely and just use numbers.
+#define _QWERTY 0
+#define _LOWER 3
+#define _RAISE 4
+#define _ADJUST 16
+
+enum custom_keycodes {
+  QWERTY = SAFE_RANGE,
+  LOWER,
+  RAISE,
+  ADJUST,
+  BACKLIT,
+  RGBRST
 };
 
-// Fillers to make layering more clear
-#define _______ KC_TRNS
-#define XXXXXXX KC_NO
+enum macro_keycodes {
+  KC_SAMPLEMACRO,
+};
 
 #define KC______ KC_TRNS
 #define KC_XXXXX KC_NO
@@ -73,10 +65,12 @@ enum layer_number {
 #define KC_LSAD  RGB_SAD
 #define KC_LVAI  RGB_VAI
 #define KC_LVAD  RGB_VAD
-#define KC_LMOD  RGB_MOD
+#define KC_LSMOD RGB_SMOD
 #define KC_CTLTB CTL_T(KC_TAB)
+#define KC_GUIEI GUI_T(KC_LANG2)
+#define KC_ALTKN ALT_T(KC_LANG1)
 
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_QWERTY] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
         ESC,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,  BSPC,\
@@ -85,7 +79,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLSH,  RSFT,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LALT, LOWER,   SPC,      ENT, RAISE, RALT \
+                                  GUIEI, LOWER,   SPC,      ENT, RAISE, ALTKN \
                               //`--------------------'  `--------------------'
   ),
 
@@ -97,7 +91,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,   F11,   F12,   F13,   F14,   F15,                    F16,   F17,   F18,   F19,   F20, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LALT, LOWER,   SPC,      ENT, RAISE, RALT \
+                                  GUIEI, LOWER,   SPC,      ENT, RAISE, ALTKN \
                               //`--------------------'  `--------------------'
   ),
 
@@ -109,7 +103,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,                   UNDS,  PLUS,  LBRC,  RBRC,  BSLS,  TILD,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LALT, LOWER,   SPC,      ENT, RAISE, RALT \
+                                  GUIEI, LOWER,   SPC,      ENT, RAISE, ALTKN \
                               //`--------------------'  `--------------------'
   ),
 
@@ -119,55 +113,89 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LTOG,  LHUI,  LSAI,  LVAI, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       LMOD,  LHUD,  LSAD,  LVAD, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
+      LSMOD,  LHUD,  LSAD,  LVAD, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LALT, LOWER,   SPC,      ENT, RAISE, RALT \
+                                  GUIEI, LOWER,   SPC,      ENT, RAISE, ALTKN \
                               //`--------------------'  `--------------------'
   )
 };
 
-// define variables for reactive RGB
-bool TOG_STATUS = false;
 int RGB_current_mode;
-#ifdef RGBLIGHT_ENABLE
-//Following line allows macro to read current RGB settings
-extern rgblight_config_t rgblight_config;
-#endif
 
 void persistent_default_layer_set(uint16_t default_layer) {
   eeconfig_update_default_layer(default_layer);
   default_layer_set(default_layer);
-  layer_state_set(default_layer);
 }
 
 // Setting ADJUST layer RGB back to default
 void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
   if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
-    #ifdef RGBLIGHT_ENABLE
-      //rgblight_mode(RGB_current_mode);
-    #endif
     layer_on(layer3);
   } else {
     layer_off(layer3);
   }
 }
 
+void matrix_init_user(void) {
+    #ifdef RGBLIGHT_ENABLE
+      RGB_current_mode = rgblight_config.mode;
+    #endif
+    //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h
+    #ifdef SSD1306OLED
+        TWI_Init(TWI_BIT_PRESCALE_1, TWI_BITLENGTH_FROM_FREQ(1, 800000));
+        iota_gfx_init(!has_usb());   // turns on the display
+    #endif
+}
+
+//SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
+#ifdef SSD1306OLED
+
+void matrix_scan_user(void) {
+   iota_gfx_task();
+}
+
+void matrix_render_user(struct CharacterMatrix *matrix) {
+  if (is_master) {
+    matrix_write_ln(matrix, read_layer_state());
+    matrix_write_ln(matrix, read_keylog());
+    matrix_write_ln(matrix, read_keylogs());
+    //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
+    //matrix_write_ln(matrix, read_host_led_state());
+    //matrix_write_ln(matrix, read_timelog());
+  } else {
+    matrix_write(matrix, read_logo());
+  }
+}
+
+void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *source) {
+  if (memcmp(dest->display, source->display, sizeof(dest->display))) {
+    memcpy(dest->display, source->display, sizeof(dest->display));
+    dest->dirty = true;
+  }
+}
+
+void iota_gfx_task_user(void) {
+  struct CharacterMatrix matrix;
+  matrix_clear(&matrix);
+  matrix_render_user(&matrix);
+  matrix_update(&display, &matrix);
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  char str[16];
+  if (record->event.pressed) {
+    set_keylog(keycode, record);
+    set_timelog();
+  }
+
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
-        #ifdef AUDIO_ENABLE
-          PLAY_SONG(tone_qwerty);
-        #endif
         persistent_default_layer_set(1UL<<_QWERTY);
       }
       return false;
       break;
     case LOWER:
       if (record->event.pressed) {
-          //not sure how to have keyboard check mode and set it to a variable, so my work around
-          //uses another variable that would be set to true after the first time a reactive key is pressed.
         layer_on(_LOWER);
         update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
@@ -178,8 +206,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case RAISE:
       if (record->event.pressed) {
-        //not sure how to have keyboard check mode and set it to a variable, so my work around
-        //uses another variable that would be set to true after the first time a reactive key is pressed.
         layer_on(_RAISE);
         update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
@@ -196,7 +222,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false;
         break;
-      //led operations - RGB mode change now updates the RGB_current_mode to allow the right RGB mode to be set after reactive keys are released
     case RGB_MOD:
       #ifdef RGBLIGHT_ENABLE
         if (record->event.pressed) {
@@ -217,73 +242,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       #endif
       break;
   }
-  if (record->event.pressed) {
-    switch (keycode) {
-    case DELBNDS:
-      delete_bonds();
-      return false;
-    case AD_WO_L:
-      restart_advertising_wo_whitelist();
-      return false;
-    case USB_EN:
-      set_usb_enabled(true);
-      return false;
-      break;
-    case USB_DIS:
-      set_usb_enabled(false);
-      return false;
-      break;
-    case BLE_EN:
-      set_ble_enabled(true);
-      return false;
-      break;
-    case BLE_DIS:
-      set_ble_enabled(false);
-      return false;
-      break;
-    case ADV_ID0:
-      restart_advertising_id(0);
-      return false;
-    case ADV_ID1:
-      restart_advertising_id(1);
-      return false;
-    case ADV_ID2:
-      restart_advertising_id(2);
-      return false;
-    case ADV_ID3:
-      restart_advertising_id(3);
-      return false;
-    case ADV_ID4:
-      restart_advertising_id(4);
-      return false;
-    case DEL_ID0:
-      delete_bond_id(0);
-      return false;
-    case DEL_ID1:
-      delete_bond_id(1);
-      return false;
-    case DEL_ID2:
-      delete_bond_id(2);
-      return false;
-    case DEL_ID3:
-      delete_bond_id(3);
-      return false;
-    case BATT_LV:
-      sprintf(str, "%4dmV", get_vcc());
-      send_string(str);
-      return false;
-    case ENT_DFU:
-      bootloader_jump();
-      return false;
-    }
-  }
-  else if (!record->event.pressed) {
-    switch (keycode) {
-    case ENT_SLP:
-      sleep_mode_enter();
-      return false;
-    }
-  }
   return true;
 }
-;
+
+#endif

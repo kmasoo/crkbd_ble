@@ -3,7 +3,7 @@ DEFAULT_FOLDER = crkbd_ble/master
 
 NRF_DEBUG = no
 
-RGBLIGHT_ENABLE = yes
+RGBLIGHT_ENABLE = no
 MOUSEKEY_ENABLE = yes	# Mouse keys
 EXTRAKEY_ENABLE = yes	# Audio control and System control
 CONSOLE_ENABLE = yes	# Console for debug

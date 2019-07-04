@@ -17,23 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CONFIG_H
+#define ENABLE_STARTUP_ADV_NOLIST
+
+/* #ifndef CONFIG_H */
 #define CONFIG_H
 
-#define BLE_NUS_MIN_INTERVAL 30
-#define BLE_NUS_MAX_INTERVAL 70
+#define BLE_NUS_MIN_INTERVAL  30  // default 
+#define BLE_NUS_MAX_INTERVAL  70  // 左右間の通信間隔(ms)　下げると消費電力が増える。default 70
+#define BLE_HID_MAX_INTERVAL  80  // 端末との通信間隔(ms)　下げると消費電力が増える。default 90
+#define BLE_HID_SLAVE_LATENCY  4  // 端末との通信パラメータ　下げると消費電力が増える。default  4
 
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x3060
 #define DEVICE_VER      0x0001
-#define MANUFACTURER    Yushakobo
-#define PRODUCT         Helix Beta
-#define DESCRIPTION     A split keyboard for the cheap makers
+#define MANUFACTURER    foostan
+#define PRODUCT         Crkbd Cherry
+#define DESCRIPTION     A split keyboard with 3x6 vertically staggered keys and 3 thumb keys
 
 /* key matrix size */
 #define MATRIX_ROWS 8
-#define MATRIX_COLS 7
+#define MATRIX_COLS 6
+
+//#define LAYOUT LAYOUT_CRKBD
+#define LAYOUT LAYOUT_kc
 
 #define DIODE_DIRECTION COL2ROW
 
@@ -54,12 +61,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 )
 
 #define PROGMEM // arm-gcc does not interpret PROGMEM
-#define RGB_DI_PIN 8     // The pin the LED strip is connected to
+#define RGB_DI_PIN 1     // The pin the LED strip is connected to
 #ifdef RGBLED_BACK
- #define RGBLED_NUM 25
-#else
-  #define RGBLED_NUM 6
-#endif
+#define RGBLED_NUM 27
 
 /*
  * Feature disable options

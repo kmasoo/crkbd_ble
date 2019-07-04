@@ -20,7 +20,7 @@ ifneq ($(strip $(CRKBD_BLE_ROWS)), 4)
     $(error CRKBD_BLE_ROWS = $(strip $(CRKBD_BLE_ROWS)) is unexpected value)
   endif
 endif
-OPT_DEFS += -DMY_CRKBD_BLE_ROWS=$(strip $(CRKBD_BLE_ROWS))
+OPT_DEFS += -DCRKBD_BLE_ROWS=$(strip $(CRKBD_BLE_ROWS))
 
 ifeq ($(strip $(LED_BACK_ENABLE)), yes)
   RGBLIGHT_ENABLE = yes
