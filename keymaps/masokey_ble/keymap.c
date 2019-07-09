@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 #include "app_ble_func.h"
 #include "action_layer.h"
+#include "send_string_keycodes.h"
 
 extern keymap_config_t keymap_config;
 
@@ -46,7 +47,7 @@ enum custom_keycodes {
     LOWER,
     RAISE,
     ADJUST,
-    NUMR,
+    NUMPAD,
     BACKLIT,
     RGBRST,
 };
@@ -57,7 +58,7 @@ enum layer_number {
     _LOWER,
     _RAISE,
     _ADJUST,
-    _NUMR,
+    _NUMPAD,
 };
 
 
@@ -80,16 +81,13 @@ enum macro_keycodes {
 #define KC_LVAD     RGB_VAD
 #define KC_LMOD     RGB_MOD
 
-//#define KC_LOWER    LOWER
-//#define KC_RAISE    RAISE
-//#define KC_ADJUST   ADJUST
-//#define KC_NUMR     NUMR
+#define KC_LOWER    LOWER
+#define KC_RAISE    RAISE
+#define KC_ADJUST   ADJUST
+#define KC_NUMPAD   NUMPAD
 
 // layer
 #define KC_L_JPEN   LT(_LOWER, LALT(KC_GRV) )
-#define KC_L_SPC    LT(_LOWER, KC_SPC)
-#define KC_R_ENT    LT(_RAISE, KC_ENT)
-#define KC_R_SPC    LT(_RAISE, KC_SPC)
 #define KC_F_ESC    LT(_NUMR,  KC_ESC)
 #define KC_AJ_SPC   LT(_ADJUST,  KC_SPC)
 
@@ -110,6 +108,7 @@ enum macro_keycodes {
 #define KC_A_SL     ALT_T(KC_SLSH)
 #define KC_A_DEL    ALT_T(KC_DEL)
 #define KC_A_INS    ALT_T(KC_INS)
+#define KC_A_NUM    ALT_T(KC_NUMPAD)
 
 
 // ble
@@ -137,10 +136,10 @@ enum macro_keycodes {
 const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_QWERTY] = LAYOUT_kc( \
-      F_ESC,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,   DEL,\
+        ESC,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,   DEL,\
       C_TAB,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCLN,  QUOT,\
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLSH, S_MNS,\
-	                                 A_INS, L_SPC, C_SPC,    C_SPC,  R_ENT,  A_DEL\
+                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
   ),
 
   [_LOWER] = LAYOUT_kc(	\
@@ -156,13 +155,13 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ESC,  EXLM,    AT,  HASH,   DLR,  LPRN,                   RPRN,  PERC,  CIRC,  AMPR,  ASTR,  BSPC,\
       C_TAB,   GRV,  MINS,   EQL,  BSLS,  LBRC,                   RBRC,  QUOT,  COMM,   DOT,  SLSH,  SCLN,\
        LSFT,  TILD,  UNDS,  PLUS,  PIPE,  LCBR,                   RCBR,  DQUO,  LABK,  RABK,  QUES, S_CLN,\
-	                                A_INS, L_SPC, C_SPC,    C_SPC,  R_ENT,  A_DEL\
+                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
   ),
   [_RAISE] = LAYOUT_kc( \
         ESC,     1,     2,     3,     4,     5,                      6,     7,     8,     9,     0,  BSPC,\
       C_TAB,     4,     5,     6,     0, XXXXX,                   LEFT,  DOWN,    UP, RIGHT,  HOME,   END,\
        LSFT,     7,     8,     9,  COMM,   DOT,                   PSCR,  LEFT,  DOWN, RIGHT,  PGDN,  PGUP,\
-	                                A_INS, L_SPC, C_SPC,    C_SPC,  R_ENT,  A_DEL\
+                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
 
  ),
   
@@ -170,14 +169,14 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         RST,  LRST, XXXXX, XXXXX, Q, AD_WO_L,                AD_WO_L, ADV_ID0 ,ADV_ID1, ADV_ID2, ADV_ID3, ADV_ID4, \
        LTOG,  LHUI,  LSAI,  LVAI, XXXXX, BLE_EN ,                BLE_DIS, DEL_ID0 ,DEL_ID1, DEL_ID2, DEL_ID3, DEL_ID4, \
        LMOD,  LHUD,  LSAD,  LVAD, XXXXX, USB_EN ,                USB_DIS, ENT_DFU, ENT_SLP, BATT_LV, XXXXX,   A  , \
-                                  XXXXX, XXXXX, XXXXX,    XXXXX, XXXXX,   XXXXX \
+                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
  ),
 
   [_NUMR] = LAYOUT_kc( \
       XXXXX,    F1,    F2,    F3,    F4,    F5,                  XXXXX, 7,     8,     9,   EQL,  XXXXX, \
       XXXXX,    F6,    F7,    F8,    F9,   F10,                   COMM, 4,     5,     6,  ASTR,   SLSH, \
       XXXXX,   F11,   F12, XXXXX, XXXXX, XXXXX,                    DOT, 1,     2,     3,  PLUS,   MINS, \
-                                  XXXXX, XXXXX, XXXXX,    XXXXX,   ENT,        0 \
+                                   A_INS, LOWER, C_SPC,    C_SPC,  RAISE,      0
  ),
 
 };
@@ -209,82 +208,91 @@ void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
 }
 bool ble_ctrl( uint16_t keycode, keyrecord_t *record ){
 	char str[16];
-    if (record->event.pressed) {
-      switch (keycode) {
-      case DELBNDS:
-        delete_bonds();
-        return false;
-      case AD_WO_L:
-        restart_advertising_wo_whitelist();
-        return false;
-      case USB_EN:
-        set_usb_enabled(true);
-        return false;
-        break;
-      case USB_DIS:
-        set_usb_enabled(false);
-        return false;
-        break;
-      case BLE_EN:
-        set_ble_enabled(true);
-        return false;
-        break;
-      case BLE_DIS:
-        set_ble_enabled(false);
-        return false;
-        break;
-      case ADV_ID0:
-        restart_advertising_id(0);
-        return false;
-      case ADV_ID1:
-        restart_advertising_id(1);
-        return false;
-      case ADV_ID2:
-        restart_advertising_id(2);
-        return false;
-      case ADV_ID3:
-        restart_advertising_id(3);
-        return false;
-      case ADV_ID4:
-        restart_advertising_id(4);
-        return false;
-      case DEL_ID0:
-        delete_bond_id(0);
-        return false;
-      case DEL_ID1:
-        delete_bond_id(1);
-        return false;
-      case DEL_ID2:
-        delete_bond_id(2);
-        return false;
-      case DEL_ID3:
-        delete_bond_id(3);
-        return false;
-      case DEL_ID4:
-        delete_bond_id(4);
-        return false;
-      case BATT_LV:
-        sprintf(str, "%4dmV", get_vcc());
-        send_string(str);
-        return false;
-      case ENT_DFU:
-        bootloader_jump();
-        return false;
-      }
+  if (record->event.pressed) {
+    switch (keycode) {
+    case DELBNDS:
+      delete_bonds();
+      return false;
+    case AD_WO_L:
+      restart_advertising_wo_whitelist();
+      return false;
+    case USB_EN:
+      set_usb_enabled(true);
+      return false;
+      break;
+    case USB_DIS:
+      set_usb_enabled(false);
+      return false;
+      break;
+    case BLE_EN:
+      set_ble_enabled(true);
+      return false;
+      break;
+    case BLE_DIS:
+      set_ble_enabled(false);
+      return false;
+      break;
+    case ADV_ID0:
+      restart_advertising_id(0);
+      return false;
+    case ADV_ID1:
+      restart_advertising_id(1);
+      return false;
+    case ADV_ID2:
+      restart_advertising_id(2);
+      return false;
+    case ADV_ID3:
+      restart_advertising_id(3);
+      return false;
+    case ADV_ID4:
+      restart_advertising_id(4);
+      return false;
+    case DEL_ID0:
+      delete_bond_id(0);
+      return false;
+    case DEL_ID1:
+      delete_bond_id(1);
+      return false;
+    case DEL_ID2:
+      delete_bond_id(2);
+      return false;
+    case DEL_ID3:
+      delete_bond_id(3);
+      return false;
+    case DEL_ID4:
+      delete_bond_id(4);
+      return false;
+    case BATT_LV:
+      sprintf(str, "%4dmV", get_vcc());
+      send_string(str);
+      return false;
+    case ENT_DFU:
+      bootloader_jump();
+      return false;
     }
-    else if (!record->event.pressed) {
-      switch (keycode) {
-      case ENT_SLP:
-        sleep_mode_enter();
-        return false;
-      }
+  }
+  else if (!record->event.pressed) {
+    switch (keycode) {
+    case ENT_SLP:
+      sleep_mode_enter();
+      return false;
     }
+  }
 	return true;
 }
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
-	//char str[16];
-  switch (keycode) {
+  //char str[16];
+  static uint16_t stored_keycode;
+  bool is_tapped;
+  bool is_toggled = false;
+
+  uint16_t prev_keycode = stored_keycode;
+
+  is_tapped = ( (!record->event.pressed) && (keycode == prev_keycode ));
+  stored_keycode = keycode;
+
+  switch ( keycode ) {
     case QWERTY:
       if (record->event.pressed) {
         persistent_default_layer_set(1UL<<_QWERTY);
@@ -293,28 +301,44 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case LOWER:
       if (record->event.pressed) {
         layer_on(_LOWER);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
         layer_off(_LOWER);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
+        if( is_tapped ){
+          SEND_STRING(SS_TAP(X_SPACE));
+        }
       }
+      update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       return false;
     case RAISE:
       if (record->event.pressed) {
         layer_on(_RAISE);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
         layer_off(_RAISE);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
+		if( is_tapped ){
+		  SEND_STRING(SS_TAP(X_ENTER));
+		}
       }
+      update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       return false;
     case ADJUST:
-        if (record->event.pressed) {
-          layer_on(_ADJUST);
+      if (record->event.pressed) {
+        layer_on(_ADJUST);
+      } else {
+        layer_off(_ADJUST);
+      }
+      return false;
+    case NUMPAD:
+      if (record->event.pressed) {
+      }else{
+        is_toggled = !is_toggled;
+
+        if( is_toggled ){
+          layer_on(_NUMPAD);
         } else {
-          layer_off(_ADJUST);
+          layer_off(_NUMPADT);
         }
-        return false;
+      }
+      return false;
   }
   return true;
 }
