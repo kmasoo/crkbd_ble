@@ -139,7 +139,7 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ESC,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,   DEL,\
       C_TAB,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCLN,  QUOT,\
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLSH, S_MNS,\
-                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
+                                   A_NUM, LOWER , C_SPC,    C_SPC,  RAISE,  A_INS
   ),
 
   [_LOWER] = LAYOUT_kc(	\
@@ -155,28 +155,28 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         ESC,  EXLM,    AT,  HASH,   DLR,  LPRN,                   RPRN,  PERC,  CIRC,  AMPR,  ASTR,  BSPC,\
       C_TAB,   GRV,  MINS,   EQL,  BSLS,  LBRC,                   RBRC,  QUOT,  COMM,   DOT,  SLSH,  SCLN,\
        LSFT,  TILD,  UNDS,  PLUS,  PIPE,  LCBR,                   RCBR,  DQUO,  LABK,  RABK,  QUES, S_CLN,\
-                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
+                                   A_NUM, LOWER , C_SPC,    C_SPC,  RAISE,  A_INS
   ),
   [_RAISE] = LAYOUT_kc( \
         ESC,     1,     2,     3,     4,     5,                      6,     7,     8,     9,     0,  BSPC,\
       C_TAB,     4,     5,     6,     0, XXXXX,                   LEFT,  DOWN,    UP, RIGHT,  HOME,   END,\
        LSFT,     7,     8,     9,  COMM,   DOT,                   PSCR,  LEFT,  DOWN, RIGHT,  PGDN,  PGUP,\
-                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
+                                   A_NUM, LOWER , C_SPC,    C_SPC,  RAISE,  A_INS
 
  ),
   
   [_ADJUST] = LAYOUT_kc( \
-        RST,  LRST, XXXXX, XXXXX, Q, AD_WO_L,                AD_WO_L, ADV_ID0 ,ADV_ID1, ADV_ID2, ADV_ID3, ADV_ID4, \
-       LTOG,  LHUI,  LSAI,  LVAI, XXXXX, BLE_EN ,                BLE_DIS, DEL_ID0 ,DEL_ID1, DEL_ID2, DEL_ID3, DEL_ID4, \
-       LMOD,  LHUD,  LSAD,  LVAD, XXXXX, USB_EN ,                USB_DIS, ENT_DFU, ENT_SLP, BATT_LV, XXXXX,   A  , \
-                                   A_INS, LOWER , C_SPC,    C_SPC,  RAISE,  A_NUM
+        RST,  XXXXX, XXXXX, XXXXX, AD_WO_L, ADV_ID0,                XXXXX  , XXXXX  , XXXXX  , XXXXX  , ADV_ID3, ADV_ID4, \
+       XXXXX, XXXXX, XXXXX, XXXXX, USB_EN, ADV_ID1 ,                BLE_DIS, DEL_ID0, DEL_ID1, DEL_ID2, DEL_ID3, DEL_ID4, \
+       XXXXX, XXXXX, XXXXX, XXXXX, BLE_EN, ADV_ID2 ,                USB_DIS, ENT_DFU, ENT_SLP, BATT_LV, XXXXX,   A  , \
+                                   A_NUM, LOWER , C_SPC,    C_SPC,  RAISE,  A_INS
  ),
 
   [_NUMR] = LAYOUT_kc( \
       XXXXX,    F1,    F2,    F3,    F4,    F5,                  XXXXX, 7,     8,     9,   EQL,  XXXXX, \
       XXXXX,    F6,    F7,    F8,    F9,   F10,                   COMM, 4,     5,     6,  ASTR,   SLSH, \
       XXXXX,   F11,   F12, XXXXX, XXXXX, XXXXX,                    DOT, 1,     2,     3,  PLUS,   MINS, \
-                                   A_INS, LOWER, C_SPC,    C_SPC,  RAISE,      0
+                                   A_NUM, LOWER, C_SPC,    C_SPC,  RAISE,      0
  ),
 
 };
@@ -207,7 +207,7 @@ void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
   }
 }
 bool ble_ctrl( uint16_t keycode, keyrecord_t *record ){
-	char str[16];
+  char str[16];
   if (record->event.pressed) {
     switch (keycode) {
     case DELBNDS:
@@ -314,9 +314,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         layer_on(_RAISE);
       } else {
         layer_off(_RAISE);
-		if( is_tapped ){
-		  SEND_STRING(SS_TAP(X_ENTER));
-		}
+        if( is_tapped ){
+          SEND_STRING(SS_TAP(X_ENTER));
+        }
       }
       update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       return false;
@@ -339,6 +339,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
       }
       return false;
+  }
+  if( !ble_ctrl(keycode,record) ){
+    return false;
   }
   return true;
 }
